@@ -1,3 +1,9 @@
+# Requirements
+### Box2D
+```bash
+pip3 install box2d-py
+```
+
 # Install 
 
 ```bash

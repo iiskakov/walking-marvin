@@ -3,6 +3,9 @@
 ```bash
 pip3 install box2d-py
 ```
+### SWIG
+```bash
+pip install swig 
 
 # Install 
 

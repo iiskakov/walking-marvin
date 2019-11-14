@@ -2,40 +2,48 @@ import gym
 import math as Math
 import numpy as np
 import time
+import random
 env = gym.make('Marvin-v0')
-
-fittest = 0
-fittest_actions = np.empty([420, 4])
-population = []
 
 
 
 class Marvin:
     
-    def __init__(self, population_size, genome_size, mut_chance=0.1):
+    def __init__(self, genome_size, mut_chance=0.1, genes = None):
         self.actions = np.empty([genome_size, 4])
         self.fitness = 0
         self.done = False
-        self.population_size = population_size
+        self.genome_size = genome_size
         self.mut_chance = mut_chance
-        self.fill_random_actions()
+        if genes is None:
+            self.fill_random_actions()
+        else:
+            self.actions = genes
+            print("I'm custom")
 
 
     def fill_random_actions(self):
-        for i in range(self.population_size):
+        for i in range(self.genome_size):
             self.actions[i] = env.action_space.sample()
 
     def walk(self):
+        self.fitness = 0
+        actions = 0
         while(True and self.done == False):
             for action in self.actions:
                 if self.done == False:
+                    actions += 1
                     observation_n, reward_n, done_n, info = env.step(action)
                     env.render()
+                    time.sleep(0.01)
                     self.fitness += reward_n
                     self.done = done_n
-                    if self.fitness < -10:
+                    if actions > 1200 and self.fitness < -5:
+                    #if self.fitness < -10:
+                        self.fitness = -200
                         self.done = True
-        self.fitness = (self.fitness - -120) / (300 - -120)
+        ##Normalize??
+        self.fitness = 1000 * (self.fitness - -200) / (300 - -200)
 
 
 class Population:
@@ -45,30 +53,42 @@ class Population:
             self.population = population
         else:
             self.population = []
-        self.fittest = 0
         self.genome_size = genome_size
         self.size = size
         print("New population created", self.size, self.genome_size)
 
     def create(self):
         for i in range(self.size):
-            population.append(Marvin(self.size, self.genome_size))
+            self.population.append(Marvin(self.genome_size))
+        #self.crossover(self.population[2].actions, self.population[1].actions)
 
     def compete(self):
         for i in range(self.size):
+            self.population[i].walk()
             env.reset()
-            (population[i]).walk()
-            print(population[i].fitness)
-        if (population[i].fitness > fittest):
-            self.fittest = population[i].fitness
-            fittest_actions = population[i].actions
-        print("I was the fittest, my fitness is ", self.fittest)
+            if (round(self.population[i].fitness) in range(random.randint(0, 300))):
+                    print("I'm gonna have sex tonight!")
+            print(self.population[i].fitness)
+
+    def crossover(self, parent_one, parent_two):
+        middle = self.genome_size // 2
+        child_genes = np.empty([self.genome_size, 4])  
+        child_genes[0:middle] = parent_one[0:middle] 
+        child_genes[middle:-1] = parent_two[middle:-1] 
+        child = Marvin(self.genome_size, genes=child_genes)
+       # print("Parent 1\n\n")
+       # print(parent_one)
+       # print("Parent 2\n\n")
+       # print(parent_two)
+       # print("Child 1")
+       # print(child.actions)
+       # print(child.actions[1][1])
+
 
 class Evolution:
 
     def __init__(self, p_size, g_size, mut_chance=0.1):
         self.population_size = p_size
-        #self.current_population = Population
         self.genome_size = g_size
         self.mutation_chance = mut_chance
 
@@ -77,23 +97,13 @@ class Evolution:
         self.current_population.create()
         self.current_population.compete()
 
+      
 
-life = Evolution(100, 400)        
+
+
+life = Evolution(10, 400)        
 life.soup()
 
 
 
-
-
-print("And here are my moves")
-while(True):
-    observation_n = env.reset()
-    done_n = False
-    while (True):
-        for action in fittest_actions:
-            if done_n == False:
-                observation_n, reward_n, done_n, info = env.step(action) # take a random action
-                env.render()
-            #time.sleep(0.01)
-#print(fittest_actions)
 env.close()

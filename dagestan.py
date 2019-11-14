@@ -19,7 +19,6 @@ class Marvin:
             self.fill_random_actions()
         else:
             self.actions = genes
-            print("I'm custom")
 
 
     def fill_random_actions(self):
@@ -35,7 +34,7 @@ class Marvin:
                     actions += 1
                     observation_n, reward_n, done_n, info = env.step(action)
                     env.render()
-                    time.sleep(0.01)
+                    #time.sleep(0.01)
                     self.fitness += reward_n
                     self.done = done_n
                     if actions > 1200 and self.fitness < -5:
@@ -55,27 +54,24 @@ class Population:
             self.population = []
         self.genome_size = genome_size
         self.size = size
+        self.next_generation = []
+        self.mating_pool = [] 
         print("New population created", self.size, self.genome_size)
 
     def create(self):
         for i in range(self.size):
             self.population.append(Marvin(self.genome_size))
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
-        self.crossover(self.population[2].actions, self.population[1].actions)
+        ##Testing crossover here
+        #self.crossover(self.population[2].actions, self.population[1].actions)
 
     def compete(self):
+        self.next_generation = []
         for i in range(self.size):
             self.population[i].walk()
             env.reset()
-            if (round(self.population[i].fitness) in range(random.randint(0, 200))):
-                    print("I'm gonna have sex tonight!")
+            if (round(self.population[i].fitness) in range(random.randint(0, 400))):
+                    print("I might have sex tonight!")
+                    self.mating_pool.append(self.population[i])
             print(self.population[i].fitness)
 
     def crossover(self, parent_one, parent_two):
@@ -88,13 +84,13 @@ class Population:
             for i in range(random.randint(0, self.genome_size//8)):
                 child_genes[random.randint(0, self.genome_size - 1)] = env.action_space.sample()
         child = Marvin(self.genome_size, genes=child_genes)
-       # print("Parent 1\n\n")
-       # print(parent_one)
-       # print("Parent 2\n\n")
-       # print(parent_two)
-       # print("Child 1")
-       # print(child.actions)
-       # print(child.actions[1][1])
+        return child
+
+    def sex(self):
+        for i in range(self.size):
+            self.next_generation.append(self.crossover(self.mating_pool[random.randint(0, len(self.mating_pool) - 1)].actions, self.mating_pool[random.randint(0, len(self.mating_pool) - 1)].actions))
+
+        self.population = self.next_generation
 
 
 class Evolution:
@@ -105,9 +101,14 @@ class Evolution:
         self.mutation_chance = mut_chance
 
     def soup(self):
+        gen = 0
         self.current_population = Population(self.population_size, self.genome_size) 
         self.current_population.create()
-        self.current_population.compete()
+        while(True):
+            print("Generation", gen)
+            self.current_population.compete()
+            self.current_population.sex()
+            gen += 1
 
       
 

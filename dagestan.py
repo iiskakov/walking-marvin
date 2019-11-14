@@ -60,13 +60,21 @@ class Population:
     def create(self):
         for i in range(self.size):
             self.population.append(Marvin(self.genome_size))
-        #self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
+        self.crossover(self.population[2].actions, self.population[1].actions)
 
     def compete(self):
         for i in range(self.size):
             self.population[i].walk()
             env.reset()
-            if (round(self.population[i].fitness) in range(random.randint(0, 300))):
+            if (round(self.population[i].fitness) in range(random.randint(0, 200))):
                     print("I'm gonna have sex tonight!")
             print(self.population[i].fitness)
 
@@ -75,6 +83,10 @@ class Population:
         child_genes = np.empty([self.genome_size, 4])  
         child_genes[0:middle] = parent_one[0:middle] 
         child_genes[middle:-1] = parent_two[middle:-1] 
+        if random.randint(0, 100) == 42:
+            print("X-RAY JUST HIT ME, MUTATION IS HAPPENING")
+            for i in range(random.randint(0, self.genome_size//8)):
+                child_genes[random.randint(0, self.genome_size - 1)] = env.action_space.sample()
         child = Marvin(self.genome_size, genes=child_genes)
        # print("Parent 1\n\n")
        # print(parent_one)

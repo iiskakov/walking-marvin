@@ -6,7 +6,6 @@ import random
 env = gym.make('Marvin-v0')
 
 
-
 class Marvin:
     
     def __init__(self, genome_size, mut_chance=0.1, genes = None):
@@ -33,7 +32,8 @@ class Marvin:
                 if self.done == False:
                     actions += 1
                     observation_n, reward_n, done_n, info = env.step(action)
-                    env.render()
+                    if life.gen > 50:
+                        env.render()
                     #time.sleep(0.01)
                     self.fitness += reward_n
                     self.done = done_n
@@ -69,27 +69,27 @@ class Population:
         for i in range(self.size):
             self.population[i].walk()
             env.reset()
-            if (round(self.population[i].fitness) in range(random.randint(0, 400))):
-                    print("I might have sex tonight!")
+            for _ in range(int(round(self.population[i].fitness))//100):
                     self.mating_pool.append(self.population[i])
-            print(self.population[i].fitness)
+        print(self.population[0].fitness)
 
     def crossover(self, parent_one, parent_two):
         middle = self.genome_size // 2
         child_genes = np.empty([self.genome_size, 4])  
         child_genes[0:middle] = parent_one[0:middle] 
         child_genes[middle:-1] = parent_two[middle:-1] 
-        if random.randint(0, 100) == 42:
-            print("X-RAY JUST HIT ME, MUTATION IS HAPPENING")
-            for i in range(random.randint(0, self.genome_size//8)):
-                child_genes[random.randint(0, self.genome_size - 1)] = env.action_space.sample()
         child = Marvin(self.genome_size, genes=child_genes)
         return child
 
     def sex(self):
         for i in range(self.size):
             self.next_generation.append(self.crossover(self.mating_pool[random.randint(0, len(self.mating_pool) - 1)].actions, self.mating_pool[random.randint(0, len(self.mating_pool) - 1)].actions))
-
+        for i in range(self.size - 1):
+            number = random.randint(0, 1000) 
+            if number == 42:
+                print("X-RAY JUST HIT ME, MUTATION IS HAPPENING")
+                self.population[i] = env.action_space.sample()
+        print("______________________________")
         self.population = self.next_generation
 
 
@@ -97,24 +97,24 @@ class Evolution:
 
     def __init__(self, p_size, g_size, mut_chance=0.1):
         self.population_size = p_size
+        self.gen = 0
         self.genome_size = g_size
         self.mutation_chance = mut_chance
 
     def soup(self):
-        gen = 0
         self.current_population = Population(self.population_size, self.genome_size) 
         self.current_population.create()
         while(True):
-            print("Generation", gen)
+            print("Generation", self.gen)
             self.current_population.compete()
             self.current_population.sex()
-            gen += 1
+            self.gen += 1
 
       
 
 
 
-life = Evolution(10, 400)        
+life = Evolution(100, 400)        
 life.soup()
 
 

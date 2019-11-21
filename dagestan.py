@@ -38,7 +38,8 @@ class Marvin:
                             env.render()
                         self.fitness += reward_n
                         self.done = done_n
-                        if self.fitness < -70:
+                        if self.fitness < -10:
+                            self.fitness -= 100
                             self.done = True
                     #if actions > 300 and self.fitness < -20:
                     #    self.fitness = -200
@@ -48,14 +49,22 @@ class Marvin:
         
 
     def display(self):
-        while(True and self.done == False):
+        print("Display")
+        actions = 0
+        self.done = False
+        while(actions < 5000):
             for action in self.actions:
+                if actions > 500:
+                    self.done == True
                 if self.done == False:
                     actions += 1
                     if np.isnan(np.min(action)) == False:
                         observation_n, reward_n, done_n, info = env.step(action)
                         env.render()
                         self.done = done_n
+                actions += 1
+
+        env.reset()
 
 
 
@@ -104,7 +113,12 @@ class Population:
         #print(sorted_population[0].actions)
         print("Median:", median_fit)
         print("Max fit:", max_fit)
-        for i in range(len(sorted_population) // 5):
+        if max_fit > 12000:
+            print(sorted_population[0].actions)
+            sorted_population[0].display()
+            sorted_population[0].display()
+            sorted_population[0].display()
+        for i in range(len(sorted_population) // 50):
             self.mating_pool.append(sorted_population[i])
             #if sorted_population[i].fitness > median_fit * 2:
             #    for _ in range(10):
@@ -180,7 +194,7 @@ class Evolution:
 
 
 
-life = Evolution(500, 30)        
+life = Evolution(1000, 10)        
 life.soup()
 
 

@@ -62,7 +62,7 @@ class Marvin:
 
 class Population:
 
-    def __init__(self, size, genome_size, population=False):
+    def __init__(self, size, genome_size, mating_pool, population=False):
         if population:
             self.population = population
             print("Population init with copy")
@@ -72,7 +72,7 @@ class Population:
         self.genome_size = genome_size
         self.size = size
         self.next_generation = []
-        self.mating_pool = [] 
+        self.mating_pool = mating_pool
 
     def create(self):
         for i in range(self.size):
@@ -91,7 +91,9 @@ class Population:
         for i in range(self.size):
             self.population[i].walk()
             env.reset()
+        print("Before sort")
         sorted_population =  sorted(self.population, key=lambda marvin: marvin.fitness, reverse=True)
+        print("Sorted len = ", len(sorted_population))
         chance = 100
         median_fit = median(marvin.fitness for marvin in self.population)
         av_fit = sum(marvin.fitness for marvin in self.population)/float(len(self.population))
@@ -102,7 +104,7 @@ class Population:
         #print(sorted_population[0].actions)
         print("Median:", median_fit)
         print("Max fit:", max_fit)
-        for i in range(len(sorted_population) // 10):
+        for i in range(len(sorted_population) // 5):
             self.mating_pool.append(sorted_population[i])
             #if sorted_population[i].fitness > median_fit * 2:
             #    for _ in range(10):
@@ -120,31 +122,37 @@ class Population:
         #    chance -= (len(sorted_population) // 100) * 2
 
     def crossover(self, parent_one, parent_two):
+        ##ver 0.2
+
+
+
+        ##ver 0.1
         rand = random.randint(2,self.genome_size)
         child_genes = np.concatenate((parent_one[:rand],parent_two[rand:]), axis=0)
         child = Marvin(self.genome_size, genes=child_genes)
         return child
 
     def sex(self):
-        p_size = len(self.mating_pool)
-        print(self.mating_pool[p_size - 1])
+        p_size = len(self.mating_pool) - 1
         for i in range(self.size):
-            dad = random.randint(0, p_size - 1)
+            dad = random.randint(0, p_size)
             while True:
-                mom = random.randint(0, p_size - 1)
+                #print("mom loop")
+                mom = random.randint(0, p_size)
+                #print(dad, mom)
                 if mom != dad: break
-            print(dad, mom)
             child = (self.crossover(self.mating_pool[dad].actions, self.mating_pool[mom].actions))
-            print("Dad", self.mating_pool[dad].actions)
-            print("Mom", self.mating_pool[mom].actions)
-            print("Child", child.actions)
+            ##Testing crossover 2
+            #print(dad, mom)
+            #print("Dad", self.mating_pool[dad].actions)
+            #print("Mom", self.mating_pool[mom].actions)
+            #print("Child", child.actions)
             self.next_generation.append(child)
         for i in range(self.size - 1):
-            number = random.randint(0, 500) 
+            number = random.randint(0, 100) 
             if number == 42:
-                print("X-RAY JUST HIT ME, MUTATION IS HAPPENING")
-                for j in self.next_generation[i].actions:
-                    j = env.action_space.sample()
+                for _ in range(self.genome_size // 3):
+                    self.next_generation[i].actions[random.randint(0, self.genome_size - 1)] = env.action_space.sample()
         print("______________________________")
         self.population = self.next_generation
 
@@ -158,7 +166,8 @@ class Evolution:
         self.mutation_chance = mut_chance
 
     def soup(self):
-        self.current_population = Population(self.population_size, self.genome_size) 
+        mating_pool = []
+        self.current_population = Population(self.population_size, self.genome_size, mating_pool) 
         self.current_population.create()
         while(True):
             print("Generation", self.gen)
@@ -171,7 +180,7 @@ class Evolution:
 
 
 
-life = Evolution(100, 10)        
+life = Evolution(500, 30)        
 life.soup()
 
 

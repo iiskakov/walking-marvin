@@ -97,6 +97,7 @@ class Population:
 
     def compete(self):
         self.next_generation = []
+        self.mating_pool = []
         for i in range(self.size):
             self.population[i].walk()
             env.reset()
@@ -113,13 +114,17 @@ class Population:
         #print(sorted_population[0].actions)
         print("Median:", median_fit)
         print("Max fit:", max_fit)
-        if max_fit > 12000:
-            print(sorted_population[0].actions)
-            sorted_population[0].display()
-            sorted_population[0].display()
-            sorted_population[0].display()
-        for i in range(len(sorted_population) // 50):
+        print("Leader actions", sorted_population[0].actions)
+        #if max_fit > 13000:
+        #    sorted_population[0].display()
+        for i in range(len(sorted_population) // 10):
             self.mating_pool.append(sorted_population[i])
+        print(self.mating_pool)
+
+        #for i in self.mating_pool:
+        #    print(i.actions)
+
+
             #if sorted_population[i].fitness > median_fit * 2:
             #    for _ in range(10):
             #        self.mating_pool.append(sorted_population[i])
@@ -148,6 +153,7 @@ class Population:
 
     def sex(self):
         p_size = len(self.mating_pool) - 1
+        print(self.next_generation)
         for i in range(self.size):
             dad = random.randint(0, p_size)
             while True:
@@ -194,7 +200,7 @@ class Evolution:
 
 
 
-life = Evolution(1000, 10)        
+life = Evolution(300, 10)        
 life.soup()
 
 

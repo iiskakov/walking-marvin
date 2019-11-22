@@ -41,14 +41,15 @@ class Marvin:
                             env.render()
                         self.fitness += reward_n
                         self.done = done_n
-                        if self.fitness < -10:
-                            self.fitness -= 100
-                            self.done = True
-                    #if actions > 300 and self.fitness < -20:
-                    #    self.fitness = -200
-                    #    self.done = True
+                        #if self.fitness < -50:
+                        #    self.fitness -= 100
+                        #    self.done = True
+                    if actions > 2000:
+                        self.fitness -= -100
+                        self.done = True
         ##Normalize??
         self.gymfit = self.fitness
+        print(self.fitness)
         self.fitness = ((1000 * (self.fitness - -300) / (600)) ** 1.4)
         
 
@@ -68,7 +69,7 @@ class Marvin:
                         self.done = done_n
                 actions += 1
 
-        env.reset()
+        #env.reset()
 
 
 
@@ -121,12 +122,12 @@ class Population:
         print("Leade timestamp", sorted_population[0].timestamp)
         print("Leader actions")
         print(sorted_population[0].actions)
-        if max_gym_fit > 100:
+        if max_gym_fit > 230:
             sorted_population[0].display()
-        for i in range(len(sorted_population) // 10):
+        for i in range(len(sorted_population) // 50):
             self.mating_pool.append(sorted_population[i])
         for i in range(5):
-            self.mating_pool.append(sorted_population[random.randint(0, len(sorted_population))])
+            self.mating_pool.append(sorted_population[random.randint(0, len(sorted_population) -1)])
         print(self.mating_pool)
 
         #for i in self.mating_pool:
@@ -208,6 +209,6 @@ class Evolution:
 
 
 
-life = Evolution(100, 10)        
+life = Evolution(1000, 10)        
 life.soup()
 env.close()

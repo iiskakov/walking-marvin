@@ -3,6 +3,7 @@ import math as Math
 import numpy as np
 import time
 import random
+import datetime
 from statistics import median
 env = gym.make('Marvin-v0')
 
@@ -12,7 +13,9 @@ class Marvin:
     def __init__(self, genome_size, mut_chance=0.1, genes = None):
         self.actions = np.empty([genome_size, 4])
         self.fitness = 0
+        self.timestamp = datetime.datetime.now()
         self.done = False
+        self.gymfit = 0 
         self.genome_size = genome_size
         self.mut_chance = mut_chance
         if genes is None:
@@ -45,6 +48,7 @@ class Marvin:
                     #    self.fitness = -200
                     #    self.done = True
         ##Normalize??
+        self.gymfit = self.fitness
         self.fitness = ((1000 * (self.fitness - -300) / (600)) ** 1.4)
         
 
@@ -104,21 +108,25 @@ class Population:
         print("Before sort")
         sorted_population =  sorted(self.population, key=lambda marvin: marvin.fitness, reverse=True)
         print("Sorted len = ", len(sorted_population))
-        chance = 100
         median_fit = median(marvin.fitness for marvin in self.population)
-        av_fit = sum(marvin.fitness for marvin in self.population)/float(len(self.population))
         max_fit = sorted_population[0].fitness
+        max_gym_fit = sorted_population[0].gymfit
         #print("Average:", av_fit)
         #for i in sorted_population:
         #    print(i.actions)
         #print(sorted_population[0].actions)
         print("Median:", median_fit)
         print("Max fit:", max_fit)
-        print("Leader actions", sorted_population[0].actions)
-        #if max_fit > 13000:
-        #    sorted_population[0].display()
+        print("Gym fit:", max_gym_fit)
+        print("Leade timestamp", sorted_population[0].timestamp)
+        print("Leader actions")
+        print(sorted_population[0].actions)
+        if max_gym_fit > 100:
+            sorted_population[0].display()
         for i in range(len(sorted_population) // 10):
             self.mating_pool.append(sorted_population[i])
+        for i in range(5):
+            self.mating_pool.append(sorted_population[random.randint(0, len(sorted_population))])
         print(self.mating_pool)
 
         #for i in self.mating_pool:
@@ -200,9 +208,6 @@ class Evolution:
 
 
 
-life = Evolution(300, 10)        
+life = Evolution(100, 10)        
 life.soup()
-
-
-
 env.close()
